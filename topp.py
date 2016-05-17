@@ -31,12 +31,15 @@ def get_param():
     return (interval,node)
 
 def get_stats(ssh):
-    temp = ssh.exec_command('ls /proc/fs/lustre/llite')
-    stats_file = ssh.exec_command('cat /proc/fs/lustre/llite/{}/extents_stats_per_second'.format(temp))
+    temp = ssh.exec_command('ls /proc/fs/lustre/llite')[1].readline().strip()
+    #print('cat /proc/fs/lustre/llite/{}/extents_stats_per_process'.format(temp))
+    stats_file = ssh.exec_command('cat /proc/fs/lustre/llite/{}/extents_stats_per_process'.format(temp))[1].readlines()
     result = []
+    #print(stats_file)
     for line in stats_file:
         item = re.split('\s+', line.strip())
         result.append(item)
+    #print(result)
     return result
 
 def show():
@@ -49,13 +52,14 @@ def show():
     sorted_write = sorted(stats_write,key=lambda x:x[1],reverse=True)
     print('Top reader:')
     print('pid\tbytes')
-    for pid,val in sorted_read:
+    for pid,val in sorted_read[:10]:
         print('{}\t{}'.format(pid,val))
-    print('===========================')
+    print('----------------------------')
     print('Top writer:')
     print('pid\tbytes')
-    for pid,val in sorted_write:
+    for pid,val in sorted_write[:10]:
         print('{}\t{}'.format(pid,val))
+    print('===========================')
 
 def topp():
     interval,node = get_param()
