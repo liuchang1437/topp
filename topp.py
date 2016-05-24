@@ -37,6 +37,7 @@ def get_stats(ssh):
         item = re.split('\s+', line.strip())
         #print(line)
         result.append(item)
+    #print(result)
     return result
 
 def show(stats):
